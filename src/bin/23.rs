@@ -3,6 +3,7 @@ use std::{
     io::stdin,
 };
 
+use itertools::Itertools;
 use strum::IntoEnumIterator;
 use utils::{direction::Direction4, rect::Rect};
 
@@ -33,11 +34,7 @@ fn main() {
         .collect();
 
     fn solution(field: &Rect<Cell>) -> usize {
-        let enterable = |pos| match field.get(pos) {
-            Some(Cell::Wall) => false,
-            None => false,
-            _ => true,
-        };
+        let enterable = |pos| !matches!(field.get(pos), Some(Cell::Wall) | None);
 
         let junctions: Vec<(isize, isize)> = field
             .cells()
@@ -72,8 +69,7 @@ fn main() {
                                     }
                                 }
                                 Some(Cell::Empty) => match Direction4::iter()
-                                    .filter(|&d| d != dir.opposite() && enterable(d.advance(pos)))
-                                    .next()
+                                    .find(|&d| d != dir.opposite() && enterable(d.advance(pos)))
                                 {
                                     Some(d) => dir = d,
                                     None => break None,
@@ -88,10 +84,20 @@ fn main() {
             .collect();
 
         let start = junctions.iter().position(|&(_, y)| y == 0).unwrap();
-        let finish = junctions
+        let mut finish = junctions
             .iter()
             .position(|&(_, y)| y == (field.height() - 1) as isize)
             .unwrap();
+        let mut finish_len = 0;
+        while let [(node, distance)] = graph
+            .iter()
+            .enumerate()
+            .filter_map(|(i, m)| m.get(&finish).map(|&distance| (i, distance)))
+            .collect_vec()[..]
+        {
+            finish = node;
+            finish_len += distance;
+        }
 
         let mut journeys = VecDeque::new();
         journeys.push_back((start, 0, HashSet::new()));
@@ -108,16 +114,15 @@ fn main() {
                 }
             }
         }
-        max_len
+        max_len + finish_len
     }
 
     let part1 = solution(&field);
     let part2 = {
         let mut field = field;
         for (_, _, cell) in field.cells_mut() {
-            match cell {
-                Cell::Only(_) => *cell = Cell::Empty,
-                _ => (),
+            if matches!(cell, Cell::Only(_)) {
+                *cell = Cell::Empty
             }
         }
         solution(&field)

@@ -5,7 +5,8 @@ use regex::Regex;
 fn main() {
     let line_re =
         Regex::new(r"^([\d-]+), *([\d-]+), *([\d-]+) *@ *([\d-]+), *([\d-]+), *([\d-]+)$").unwrap();
-    let input: Vec<((i128, i128, i128), (i128, i128, i128))> = stdin()
+    type Vector = (i128, i128, i128);
+    let input: Vec<(Vector, Vector)> = stdin()
         .lines()
         .map(|res| {
             let line = res.unwrap();

@@ -21,7 +21,7 @@ fn main() {
             .collect::<Rect<_>>();
         let mut queue = PriorityQueue::new();
         for dir in [Direction4::East, Direction4::South] {
-            queue.push_increase((dir.advance((0, 0)), 0 as u8, dir), Reverse(0));
+            queue.push_increase((dir.advance((0, 0)), 0u8, dir), Reverse(0));
         }
         loop {
             let Some(((pos, consecutive, dir), Reverse(len))) = queue.pop() else {
@@ -53,7 +53,7 @@ fn main() {
             .collect::<Rect<_>>();
         let mut queue = PriorityQueue::new();
         for dir in [Direction4::East, Direction4::South] {
-            queue.push_increase((dir.advance((0, 0)), 0 as u8, dir), Reverse(0));
+            queue.push_increase((dir.advance((0, 0)), 0u8, dir), Reverse(0));
         }
         loop {
             let Some(((pos, consecutive, dir), Reverse(len))) = queue.pop() else {

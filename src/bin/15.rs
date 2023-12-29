@@ -6,7 +6,7 @@ fn main() {
         .next()
         .unwrap()
         .unwrap()
-        .split(",")
+        .split(',')
         .map(String::from)
         .collect();
 
@@ -27,12 +27,12 @@ fn main() {
         type Err = ();
 
         fn from_str(s: &str) -> Result<Self, Self::Err> {
-            if let Some((key, value)) = s.split_once("=") {
+            if let Some((key, value)) = s.split_once('=') {
                 Ok(Step::Insert(
                     String::from(key),
                     value.parse().map_err(|_| ())?,
                 ))
-            } else if let Some((key, "")) = s.split_once("-") {
+            } else if let Some((key, "")) = s.split_once('-') {
                 Ok(Step::Delete(String::from(key)))
             } else {
                 Err(())

@@ -7,6 +7,13 @@ use std::{
 
 use regex::Regex;
 
+struct Step {
+    property: usize,
+    greater: bool,
+    constant: u32,
+    action: Action,
+}
+
 #[derive(Clone)]
 enum Action {
     Accept,
@@ -34,32 +41,33 @@ fn main() {
         let mut input = String::new();
         stdin().read_to_string(&mut input).unwrap();
         let (workflows, parts) = input.split_once("\n\n").unwrap();
-        let workflows: HashMap<String, (Vec<(usize, bool, u32, Action)>, Action)> = workflows
+        let workflows: HashMap<String, (Vec<Step>, Action)> = workflows
             .lines()
             .map(|workflow| {
-                let [name, steps, fallback] = workflow_re.captures(&workflow).unwrap().extract().1;
+                let [name, steps, fallback] = workflow_re.captures(workflow).unwrap().extract().1;
                 let steps = steps
-                    .split(",")
+                    .split(',')
                     .map(|step| {
-                        let [prop, op, num, action] = step_re.captures(&step).unwrap().extract().1;
-                        let prop = match prop.chars().next().unwrap() {
+                        let [property, op, num, action] =
+                            step_re.captures(step).unwrap().extract().1;
+                        let property = match property.chars().next().unwrap() {
                             'x' => 0,
                             'm' => 1,
                             'a' => 2,
                             's' => 3,
                             _ => panic!(),
                         };
-                        let op = match op.chars().next().unwrap() {
+                        let greater = match op.chars().next().unwrap() {
                             '<' => false,
                             '>' => true,
                             _ => panic!(),
                         };
-                        (
-                            prop,
-                            op,
-                            str::parse(num).unwrap(),
-                            str::parse(action).unwrap(),
-                        )
+                        Step {
+                            property,
+                            greater,
+                            constant: str::parse(num).unwrap(),
+                            action: str::parse(action).unwrap(),
+                        }
                     })
                     .collect();
                 (String::from(name), (steps, str::parse(fallback).unwrap()))
@@ -69,7 +77,7 @@ fn main() {
             .lines()
             .map(|part| {
                 part_re
-                    .captures(&part)
+                    .captures(part)
                     .unwrap()
                     .extract()
                     .1
@@ -89,13 +97,13 @@ fn main() {
                     Action::Reject => break false,
                     Action::Delegate(ref workflow) => {
                         let (steps, fallback) = &workflows[workflow];
-                        for &(prop, op, num, ref act) in steps {
-                            if if op {
-                                part[prop] > num
+                        for step in steps {
+                            if if step.greater {
+                                part[step.property] > step.constant
                             } else {
-                                part[prop] < num
+                                part[step.property] < step.constant
                             } {
-                                action = act.clone();
+                                action = step.action.clone();
                                 continue 'filter;
                             }
                         }
@@ -124,26 +132,26 @@ fn main() {
         queue.push_back(([1, 1, 1, 1], [4000, 4000, 4000, 4000], String::from("in")));
         'queue: while let Some((mut min, mut max, workflow)) = queue.pop_front() {
             let (steps, fallback) = &workflows[&workflow];
-            for &(prop, op, num, ref action) in steps {
-                if op {
-                    if max[prop] > num {
+            for step in steps {
+                if step.greater {
+                    if max[step.property] > step.constant {
                         let mut min = min;
-                        min[prop] = num + 1;
-                        act(&mut queue, action, min, max)
+                        min[step.property] = step.constant + 1;
+                        act(&mut queue, &step.action, min, max)
                     }
-                    if min[prop] <= num {
-                        max[prop] = num;
+                    if min[step.property] <= step.constant {
+                        max[step.property] = step.constant;
                     } else {
                         continue 'queue;
                     }
                 } else {
-                    if min[prop] < num {
+                    if min[step.property] < step.constant {
                         let mut max = max;
-                        max[prop] = num - 1;
-                        act(&mut queue, action, min, max)
+                        max[step.property] = step.constant - 1;
+                        act(&mut queue, &step.action, min, max)
                     }
-                    if max[prop] >= num {
-                        min[prop] = num;
+                    if max[step.property] >= step.constant {
+                        min[step.property] = step.constant;
                     } else {
                         continue 'queue;
                     }

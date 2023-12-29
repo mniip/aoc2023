@@ -5,7 +5,6 @@ use utils::rect::{Rect, Transposed};
 fn main() {
     let field: Rect<bool> = stdin()
         .lines()
-        .into_iter()
         .map(|res| res.unwrap().chars().map(|c| c == '#').collect())
         .collect();
 

@@ -8,15 +8,16 @@ use std::{
 use itertools::Itertools;
 
 fn main() {
-    let blocks: Vec<((u32, u32, u32), (u32, u32, u32))> = stdin()
+    type Point = (u32, u32, u32);
+    let blocks: Vec<(Point, Point)> = stdin()
         .lines()
         .map(|res| {
             let line = res.unwrap();
-            let (p1, p2) = line.split_once("~").unwrap();
-            let (x1, p1) = p1.split_once(",").unwrap();
-            let (y1, z1) = p1.split_once(",").unwrap();
-            let (x2, p2) = p2.split_once(",").unwrap();
-            let (y2, z2) = p2.split_once(",").unwrap();
+            let (p1, p2) = line.split_once('~').unwrap();
+            let (x1, p1) = p1.split_once(',').unwrap();
+            let (y1, z1) = p1.split_once(',').unwrap();
+            let (x2, p2) = p2.split_once(',').unwrap();
+            let (y2, z2) = p2.split_once(',').unwrap();
             let x1: u32 = str::parse(x1).unwrap();
             let y1: u32 = str::parse(y1).unwrap();
             let z1: u32 = str::parse(z1).unwrap();

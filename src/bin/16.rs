@@ -78,7 +78,7 @@ fn main() {
         walk(&board, &mut energized, init_pos, init_dir);
         energized
             .cells()
-            .filter(|(_, _, mask)| mask.into_iter().copied().any(identity))
+            .filter(|(_, _, mask)| mask.iter().copied().any(identity))
             .count()
     };
 

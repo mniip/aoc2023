@@ -40,7 +40,7 @@ fn main() {
         graph
     };
 
-    fn cut_pairs(graph: &Vec<Vec<usize>>) -> Vec<((usize, usize), (usize, usize))> {
+    fn cut_pairs(graph: &[Vec<usize>]) -> Vec<((usize, usize), (usize, usize))> {
         #[derive(Clone, Copy)]
         struct CutPath(usize, usize, usize, usize);
 
@@ -54,12 +54,14 @@ fn main() {
             dfs: u32,
         }
 
+        type Edge = (usize, usize);
+
         fn find_cut_pairs(
             graph: &[Vec<usize>],
             data: &mut [Option<VertexData>],
             stacks: &mut [Vec<CutPath>],
             dfs: &mut u32,
-            cut_pairs: &mut Vec<((usize, usize), (usize, usize))>,
+            cut_pairs: &mut Vec<(Edge, Edge)>,
             v: usize,
             parent: usize,
         ) {
@@ -139,11 +141,13 @@ fn main() {
             for &u in &graph[v] {
                 let u_data = data[u].unwrap();
                 if u_data.parent != v && v_data.dfs < u_data.dfs {
-                    while stacks[v].last().is_some_and(|&CutPath(x, y, _, _)| {
-                        let y_data = data[y].as_ref().unwrap();
+                    let should_pop = |x, y_data: &VertexData| {
                         y_data.parent == x
                             && y_data.dfs <= u_data.dfs
-                            && u_data.dfs <= y_data.dfs + y_data.nd - 1
+                            && u_data.dfs < y_data.dfs + y_data.nd
+                    };
+                    while stacks[v].last().is_some_and(|&CutPath(x, y, _, _)| {
+                        should_pop(x, data[y].as_ref().unwrap())
                     }) {
                         stacks[v].pop();
                     }
@@ -154,7 +158,7 @@ fn main() {
         let mut stacks = graph.iter().map(|_| Vec::new()).collect_vec();
         let mut cut_pairs = Vec::new();
         find_cut_pairs(
-            &graph,
+            graph,
             &mut data[..],
             &mut stacks,
             &mut 0,

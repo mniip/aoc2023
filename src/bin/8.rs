@@ -56,12 +56,12 @@ fn main() {
         }
 
         fn is_fin_node(node: &str) -> bool {
-            node.ends_with("Z")
+            node.ends_with('Z')
         }
 
         let structure = graph
             .keys()
-            .filter(|&node| node.ends_with("A"))
+            .filter(|&node| node.ends_with('A'))
             .map(|node| {
                 let (init, cycle) = iterate((0, node), |&(count, node)| {
                     (

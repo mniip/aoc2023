@@ -15,11 +15,11 @@ const ZERO_ROUND: Round = Round {
 };
 
 fn max_rounds(r1: Round, r2: Round) -> Round {
-    return Round {
+    Round {
         red: Ord::max(r1.red, r2.red),
         green: Ord::max(r1.green, r2.green),
         blue: Ord::max(r1.blue, r2.blue),
-    };
+    }
 }
 
 #[derive(Debug)]
@@ -35,7 +35,7 @@ impl FromStr for Game {
         let game_re = Regex::new(r"^Game (\d+):(.*)$")?;
         let ball_re = Regex::new(r"^\s*(\d+)\s+(\w+)\s*$")?;
         let [id_str, rest] = game_re
-            .captures(&g)
+            .captures(g)
             .ok_or("Could not parse game")?
             .extract()
             .1;

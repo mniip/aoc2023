@@ -33,7 +33,7 @@ fn main() {
                     Direction4::East => -pos.1,
                 } as i64;
         }
-        (area.abs() as u64 + len as u64) / 2 + 1
+        (area.unsigned_abs() + len as u64) / 2 + 1
     }
 
     let part1 = solution(input.iter().map(|&(dir, dist, _)| {

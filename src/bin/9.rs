@@ -3,7 +3,6 @@ use std::io::stdin;
 fn main() {
     let numbers = stdin()
         .lines()
-        .into_iter()
         .map(|res| {
             res.unwrap()
                 .split_ascii_whitespace()

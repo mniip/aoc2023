@@ -12,7 +12,7 @@ fn main() {
         .lines()
         .map(|res| {
             let line = res.unwrap();
-            let (row, clues) = line.split_once(" ").unwrap();
+            let (row, clues) = line.split_once(' ').unwrap();
             (
                 row.chars()
                     .map(|c| match c {
@@ -23,7 +23,7 @@ fn main() {
                     })
                     .collect(),
                 clues
-                    .split(",")
+                    .split(',')
                     .map(str::parse)
                     .collect::<Result<_, _>>()
                     .unwrap(),

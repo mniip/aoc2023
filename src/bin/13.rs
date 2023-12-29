@@ -11,7 +11,7 @@ fn main() {
             .split("\n\n")
             .map(|block| {
                 block
-                    .split("\n")
+                    .split('\n')
                     .map(|line| line.chars().map(|c| c == '#').collect())
                     .collect()
             })

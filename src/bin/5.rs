@@ -94,7 +94,7 @@ fn main() {
                     }
                     input = output
                 }
-                mapped.extend(input.into_iter());
+                mapped.extend(input);
                 mapped
             },
         )

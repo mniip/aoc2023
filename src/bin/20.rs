@@ -5,6 +5,7 @@ use std::{
     mem,
 };
 
+use itertools::Itertools;
 use utils::numbers::lcm;
 
 #[derive(PartialEq, Eq, Debug)]
@@ -51,8 +52,8 @@ fn main() {
             let (name, out) = line.split_once(" -> ").unwrap();
             let (name, kind) = match name {
                 "broadcaster" => (name, ModuleType::Broadcaster),
-                _ if name.starts_with("%") => (&name[1..], ModuleType::FlipFlop),
-                _ if name.starts_with("&") => (&name[1..], ModuleType::Conjunction),
+                _ if name.starts_with('%') => (&name[1..], ModuleType::FlipFlop),
+                _ if name.starts_with('&') => (&name[1..], ModuleType::Conjunction),
                 _ => panic!(),
             };
             let index = resolve(&mut modules, &mut names, name);
@@ -103,8 +104,8 @@ fn main() {
     }
 
     fn handle_pulse(
-        modules: &Vec<Module>,
-        state: &mut Vec<ModuleState>,
+        modules: &[Module],
+        state: &mut [ModuleState],
         pulses: &mut VecDeque<(bool, usize, usize)>,
         high: bool,
         from: usize,
@@ -143,7 +144,7 @@ fn main() {
     let broadcaster = indices["broadcaster"];
 
     let part1 = {
-        let mut state = modules.iter().map(init_state).collect();
+        let mut state = modules.iter().map(init_state).collect_vec();
         let mut high_count: usize = 0;
         let mut low_count: usize = 0;
         let mut pulses = VecDeque::new();
@@ -198,23 +199,13 @@ fn main() {
                     assert_eq!(modules[center].kind, ModuleType::FlipFlop);
                     seq.push_back(center);
                     let mut bit = center;
-                    while let Some(&b) = modules[bit]
-                        .outputs
-                        .iter()
-                        .filter(|&i| bits.contains(i))
-                        .next()
-                    {
+                    while let Some(&b) = modules[bit].outputs.iter().find(|&i| bits.contains(i)) {
                         assert_eq!(modules[b].kind, ModuleType::FlipFlop);
                         seq.push_back(b);
                         bit = b;
                     }
                     let mut bit = center;
-                    while let Some(&b) = modules[bit]
-                        .inputs
-                        .iter()
-                        .filter(|&i| bits.contains(i))
-                        .next()
-                    {
+                    while let Some(&b) = modules[bit].inputs.iter().find(|&i| bits.contains(i)) {
                         assert_eq!(modules[b].kind, ModuleType::FlipFlop);
                         seq.push_front(b);
                         bit = b;
